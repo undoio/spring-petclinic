@@ -1,5 +1,60 @@
 # Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=main)](https://travis-ci.org/spring-projects/spring-petclinic/)
 
+## Undo usage
+
+See below for the usual PetClinic overview but this section describes the Undo usage.
+
+### Forcing the maven junit tests to fail
+
+We have modified the code to allow us to force an error to occur when adding a pet. This is done by specifying
+a system property on the command line containing the name of the pet to be rejected. Because one of the junit tests
+adds a pet named "Betty" we can make that test fails by running the build as follows:
+
+```
+./mvnw -Dundo.bad.pet.name=Betty package
+```
+
+To produce an undo recording of the test failure do:
+
+```
+./mvnw -Dundo.bad.pet.name=Betty -DargLine="-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:$UNDO_HOME/jdwp/distribution/target/lr4j-replay-1.0/lr4j/undo-jdwp-agent-1.0.so=save_on=failure,max_event_log_size=1G" package
+```
+
+### Forcing a failure in the web app
+
+Similarly we can force a rejection of a particular pet name to occur (together with recording) by running the web app as follows:
+
+```
+java -Dundo.bad.pet.name=Rover -DargLine="-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:$UNDO_HOME/jdwp/distribution/target/lr4j-replay-1.0/lr4j/undo-jdwp-agent-1.0.so=save_on=always,output=rover.undo,max_event_log_size=1G" -jar target/spring-petclinic-2.4.2.jar
+```
+
+Then to produce a failure, after navigating to http://localhost:8080/ do:
+
+* click on [FIND OWNERS](http://localhost:8080/owners/find)
+* click on `Find Owners` (you can leave search box blank to show all)
+* click on any of the names
+* click `Add New Pet`
+* enter the name `Rover` (or whatever you chose as `undo.bad.pet.name`) and the other fields and then click `Add Pet`
+
+You should see the message `rejected to force test failure`
+
+### Debugging the failure with IntelliJ
+
+After launching `lr4j_replay` in the usual way and attaching with IntelliJ, set a breakpoint at 
+line 82 of `src/main/java/org/springframework/samples/petclinic/owner/PetController.java`:
+
+```
+ 76     @PostMapping("/pets/new")
+ 77     public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, ModelMap model) {
+ 78         if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
+ 79             result.rejectValue("name", "duplicate", "already exists");
+ 80         }
+ 81         if (pet.getName().equals(System.getProperty("undo.bad.pet.name"))) {
+ 82             result.rejectValue("name", "invalid", "rejected to force test failure");
+ 83         }
+ 84         owner.addPet(pet);
+```
+
 ## Understanding the Spring Petclinic application with a few diagrams
 <a href="https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application">See the presentation here</a>
 
