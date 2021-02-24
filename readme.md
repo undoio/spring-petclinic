@@ -41,18 +41,20 @@ You should see the message `rejected to force test failure`
 ### Debugging the failure with IntelliJ
 
 After launching `lr4j_replay` in the usual way and attaching with IntelliJ, set a breakpoint at 
-line 82 of `src/main/java/org/springframework/samples/petclinic/owner/PetController.java`:
+line 46 of `src/main/java/org/springframework/samples/petclinic/owner/PetValidator.java`:
 
 ```
- 76     @PostMapping("/pets/new")
- 77     public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, ModelMap model) {
- 78         if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
- 79             result.rejectValue("name", "duplicate", "already exists");
- 80         }
- 81         if (pet.getName().equals(System.getProperty("undo.bad.pet.name"))) {
- 82             result.rejectValue("name", "invalid", "rejected to force test failure");
- 83         }
- 84         owner.addPet(pet);
+ 37     public void validate(Object obj, Errors errors) {
+ 38         Pet pet = (Pet) obj;
+ 39         String name = pet.getName();
+ 40         // name validation
+ 41         if (!StringUtils.hasLength(name)) {
+ 42             errors.rejectValue("name", REQUIRED, REQUIRED);
+ 43         }
+ 44
+ 45         if (name.equals(System.getProperty("undo.bad.pet.name"))) {
+ 46             errors.rejectValue("name", "invalid", "rejected to force test failure");
+ 47         }
 ```
 
 ## Understanding the Spring Petclinic application with a few diagrams

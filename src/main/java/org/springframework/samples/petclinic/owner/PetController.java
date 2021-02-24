@@ -78,9 +78,6 @@ class PetController {
 		if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
 			result.rejectValue("name", "duplicate", "already exists");
 		}
-		if (pet.getName().equals(System.getProperty("undo.bad.pet.name"))) {
-			result.rejectValue("name", "invalid", "rejected to force test failure");
-		}
 		owner.addPet(pet);
 		if (result.hasErrors()) {
 			model.put("pet", pet);

@@ -42,6 +42,10 @@ public class PetValidator implements Validator {
 			errors.rejectValue("name", REQUIRED, REQUIRED);
 		}
 
+		if (name.equals(System.getProperty("undo.bad.pet.name"))) {
+			errors.rejectValue("name", "invalid", "rejected to force test failure");
+		}
+
 		// type validation
 		if (pet.isNew() && pet.getType() == null) {
 			errors.rejectValue("type", REQUIRED, REQUIRED);

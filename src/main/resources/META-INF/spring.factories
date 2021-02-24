@@ -1,1 +1,1 @@
-org.springframework.test.context.TestExecutionListener=org.springframework.samples.petclinic.UndoRunListener
+org.springframework.test.context.TestExecutionListener=org.springframework.samples.petclinic.UndoTestExecutionListener
