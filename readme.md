@@ -2,7 +2,9 @@
 
 ## Undo usage
 
-See below for the usual PetClinic overview but this section describes the Undo usage.
+See below for the usual PetClinic overview but this section describes the Undo usage. It assumes that an env var `UNDO_HOME` has
+been set which contains directories `lr4j-record-1.0` and `lr4j-replay-1.0` each of which contain the contents of
+the respective zip files.
 
 ### Forcing the maven junit tests to fail
 
@@ -11,21 +13,19 @@ a system property on the command line containing the name of the pet to be rejec
 adds a pet named "Betty" we can make that test fails by running the build as follows:
 
 ```
-./mvnw -Dundo.bad.pet.name=Betty package
+./mvnw -Dundo.bad.pet.name=Betty -Dundo.basedir=$UNDO_HOME/lr4j-record-1.0 -DargLine="-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:$UNDO_HOME/lr4j-replay-1.0/lr4j/undo-jdwp-agent-1.0.so" package
 ```
 
-To produce an undo recording of the test failure do:
-
-```
-./mvnw -Dundo.bad.pet.name=Betty -DargLine="-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:$UNDO_HOME/jdwp/distribution/target/lr4j-replay-1.0/lr4j/undo-jdwp-agent-1.0.so=save_on=failure,max_event_log_size=1G" package
-```
+This will also output recordings of the tests which fail because we have an `UndoTestExecutionListener` which detects
+test failures and uses the LR4J API to save the recording. Note that recording is always on regardless of success or
+failure of the test.
 
 ### Forcing a failure in the web app
 
 Similarly we can force a rejection of a particular pet name to occur (together with recording) by running the web app as follows:
 
 ```
-java -Dundo.bad.pet.name=Rover -DargLine="-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:$UNDO_HOME/jdwp/distribution/target/lr4j-replay-1.0/lr4j/undo-jdwp-agent-1.0.so=save_on=always,output=rover.undo,max_event_log_size=1G" -jar target/spring-petclinic-2.4.2.jar
+java -Dundo.bad.pet.name=Rover -DargLine="-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:$UNDO_HOME/lr4j-replay-1.0/lr4j/undo-jdwp-agent-1.0.so=save_on=always,output=rover.undo,max_event_log_size=1G" -jar target/spring-petclinic-2.4.2.jar
 ```
 
 Then to produce a failure, after navigating to http://localhost:8080/ do:

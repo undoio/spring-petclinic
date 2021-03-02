@@ -33,6 +33,14 @@
   </properties>
 
   <dependencies>
+    <!-- Undo LR4JAPI dependency -->
+    <dependency>
+      <groupId>undo</groupId>
+      <artifactId>lr4j_api</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${undo.basedir}/lr4j_api-1.0.jar</systemPath>
+    </dependency>
     <!-- Spring and Spring Boot dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
