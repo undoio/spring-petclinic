@@ -132,6 +132,13 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.2</version>
+        <configuration>
+          <argLine>-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:${undo.basedir}/lr4j-record-1.0.so</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>io.spring.javaformat</groupId>
         <artifactId>spring-javaformat-maven-plugin</artifactId>
         <version>${spring-format.version}</version>

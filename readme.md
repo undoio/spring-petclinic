@@ -12,7 +12,7 @@ a system property on the command line containing the name of the pet to be rejec
 adds a pet named "Betty" we can make that test fails by running the build as follows:
 
 ```
-./mvnw -Dundo.bad.pet.name=Betty -Dundo.basedir=$UNDO_HOME -DargLine="-XX:-Inline -XX:TieredStopAtLevel=1 -XX:UseAVX=2 -Dsun.zip.disableMemoryMapping=true -agentpath:$UNDO_HOME/lr4j-record-1.0.so" package
+./mvnw -Dundo.bad.pet.name=Betty -Dundo.basedir=$UNDO_HOME package
 ```
 
 This will also output recordings of the tests which fail because we have an `UndoTestExecutionListener` which detects
